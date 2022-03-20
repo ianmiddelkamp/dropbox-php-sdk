@@ -679,6 +679,66 @@ class Dropbox
         //Make and return the Model
         return ModelFactory::make($body['metadata']);
     }
+    public function getLink($path, $doSwap = true)
+    {
+         try {
+              $linkdata = $this->getSharedLink($path);
+              //var_dump($linkdata);
+              $link = $linkdata{
+              'url'};
+         } catch (DropboxClientException $e) {
+              //var_dump($e);
+              if ($e->getCode() == 409) {
+                   $linkdata = $this->getExistingSharedLink($path);
+                   $link = $linkdata{
+                   'links'}[0]{
+                   'url'};
+              }
+         }
+         if($doSwap){
+              $missingurl = rtrim($link, "?dl=0");
+              $missingurl = str_replace("www", "dl", $missingurl);
+              return $missingurl;
+         }else{
+              return $link;
+         }
+
+    
+    }
+    public function getExistingSharedLink($path)
+    {
+         //Path cannot be null
+         if (is_null($path)) {
+              throw new DropboxClientException("Path cannot be null.");
+         }
+
+         //Create Folder
+         $response = $this->postToAPI('/sharing/list_shared_links', ['path' => $path, "direct_only" => true]);
+
+
+         //Fetch the Metadata
+         $body = $response->getDecodedBody();
+         //var_dump($body);
+         //Make and Return the Model
+         return $body;
+    }
+    public function getSharedLink($path)
+    {
+         //Path cannot be null
+         if (is_null($path)) {
+              throw new DropboxClientException("Path cannot be null.");
+         }
+         //$params['path'] = $path;
+         //Create Folder
+         $response = $this->postToAPI('/sharing/create_shared_link_with_settings',  ['path' => $path]);
+
+
+         //Fetch the Metadata
+         $body = $response->getDecodedBody();
+         //var_dump($body);
+         //Make and Return the Model
+         return $body;
+    }
 
     /**
      * Get a temporary link to stream contents of a file
