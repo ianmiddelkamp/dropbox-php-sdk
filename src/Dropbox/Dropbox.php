@@ -684,15 +684,12 @@ class Dropbox
          try {
               $linkdata = $this->getSharedLink($path);
               //var_dump($linkdata);
-              $link = $linkdata{
-              'url'};
+              $link = $linkdata['url'];
          } catch (DropboxClientException $e) {
               //var_dump($e);
               if ($e->getCode() == 409) {
                    $linkdata = $this->getExistingSharedLink($path);
-                   $link = $linkdata{
-                   'links'}[0]{
-                   'url'};
+                   $link = $linkdata['links'][0]['url'];
               }
          }
          if($doSwap){
