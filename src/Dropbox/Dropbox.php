@@ -681,10 +681,12 @@ class Dropbox
     }
     public function getLink($path, $doSwap = true)
     {
-         try {
+        $link = null;
+        try {
               $linkdata = $this->getSharedLink($path);
               //var_dump($linkdata);
               $link = $linkdata['url'];
+              
          } catch (DropboxClientException $e) {
               //var_dump($e);
               if ($e->getCode() == 409) {
@@ -692,12 +694,19 @@ class Dropbox
                    $link = $linkdata['links'][0]['url'];
               }
          }
-         if($doSwap){
-              $missingurl = rtrim($link, "?dl=0");
+    
+         if($doSwap && strpos($link, "&dl=0" )> 0){
+         
+              $missingurl = rtrim($link, "&dl=0");
               $missingurl = str_replace("www", "dl", $missingurl);
               return $missingurl;
-         }else{
-              return $link;
+         }else if ($doSwap && strpos($link, "?dl=0" )> 0){
+         
+            $missingurl = rtrim($link, "?dl=0");
+            $missingurl = str_replace("www", "dl", $missingurl);
+            return $missingurl;
+       }else{
+             return $link;
          }
 
     
