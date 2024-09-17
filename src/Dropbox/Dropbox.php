@@ -697,7 +697,8 @@ class Dropbox
     
          if($doSwap && strpos($link, "&dl=0" )> 0){
          
-              $missingurl = rtrim($link, "&dl=0");
+          //     $missingurl = rtrim($link, "&dl=0");
+              $missingurl = str_replace("&dl=0", "", $link);
               $missingurl = str_replace("www", "dl", $missingurl);
               return $missingurl;
          }else if ($doSwap && strpos($link, "?dl=0" )> 0){
